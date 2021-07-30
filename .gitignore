@@ -1,1 +1,4 @@
 minst.pkl.gz
+.idea
+.pytest_cache
+*/__pycache__
