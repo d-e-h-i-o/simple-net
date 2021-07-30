@@ -11,7 +11,7 @@ def test_version():
 @pytest.fixture
 def x():
     ((x_train, y_train), (x_test, y_test), _) = load_mnist()
-    return x_test[0]
+    return x_test[0].reshape(-1, 784)
 
 @pytest.fixture
 def y():
@@ -24,8 +24,9 @@ def test_simple_net(x, y):
     assert nn.weights_0_1.shape == (784, 264)
     assert nn.weights_1_2.shape == (264, 10)
 
-    assert nn.forward(x).all()
+    assert nn.forward(x)[0].all()
     assert 0 <= nn.predict(x) < 10
+    nn.backpropagate(x, y)
 
 def test_relu():
     array = np.array([1, 2, 3, -1, 0])
