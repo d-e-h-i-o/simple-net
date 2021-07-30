@@ -22,6 +22,7 @@ class SimpleNet:
         return layer_2, layer_1
 
     def backpropagate(self, x, y):
+        x = x.reshape(-1, 784) # TODO: understand why this is necessary
         layer_2, layer_1 = self.forward(x)
         goal = np.zeros(10)
         goal[y] = 1
@@ -34,5 +35,23 @@ class SimpleNet:
 
     def predict(self, x):
         # TODO: change to softmax
-        layer_2, _ = self.forward(x)
+        layer_2, _ = self.forward(x.reshape(-1, 784))
         return np.argmax(layer_2)
+
+    def train(self, x_train, y_train):
+
+        assert len(x_train) == len(y_train)
+
+        for i in range(len(x_train)):
+            self.backpropagate(x_train[i], y_train[i])
+
+    def test(self, x_test, y_test):
+
+        assert len(x_test) == len(y_test)
+
+        correct = 0 
+
+        for i in range(len(x_test)):
+            correct += self.predict(x_test[i]) == y_test[i]
+
+        return correct / len(x_test)

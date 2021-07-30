@@ -5,13 +5,16 @@ from simple_net import __version__
 from simple_net import SimpleNet, load_mnist
 from simple_net.simple_net import relu
 
+
 def test_version():
     assert __version__ == "0.1.0"
+
 
 @pytest.fixture
 def x():
     ((x_train, y_train), (x_test, y_test), _) = load_mnist()
-    return x_test[0].reshape(-1, 784)
+    return x_test[0]
+
 
 @pytest.fixture
 def y():
@@ -28,11 +31,13 @@ def test_simple_net(x, y):
     assert 0 <= nn.predict(x) < 10
     nn.backpropagate(x, y)
 
+
 def test_relu():
     array = np.array([1, 2, 3, -1, 0])
     expected = np.array([1, 2, 3, 0, 0])
 
     assert (relu(array) == expected).all()
+
 
 def test_mnist():
     ((x_train, y_train), (x_test, y_test), _) = load_mnist()
