@@ -1,5 +1,5 @@
 import numpy as np
-
+import sys
 
 def relu(x):
     return (x > 0) * x
@@ -8,11 +8,12 @@ def relu(x):
 def relu2deriv(output):
     return output > 0
 
+# np.set_printoptions(threshold=sys.maxsize)
 
 class SimpleNet:
-    def __init__(self, alpha=0.1):
-        self.weights_0_1 = np.random.random((784, 264))
-        self.weights_1_2 = np.random.random((264, 10))
+    def __init__(self, alpha=0.005):
+        self.weights_0_1 = 0.2 * np.random.random((784, 264)) - 0.1
+        self.weights_1_2 = 0.2 * np.random.random((264, 10)) - 0.1
         self.alpha = alpha
 
     def forward(self, x):
@@ -33,25 +34,45 @@ class SimpleNet:
         self.weights_1_2 += self.alpha * layer_1.T.dot(layer_2_delta)
         self.weights_0_1 += self.alpha * x.T.dot(layer_1_delta)
 
+        return np.sum(error)
+
     def predict(self, x):
         # TODO: change to softmax
         layer_2, _ = self.forward(x.reshape(-1, 784))
         return np.argmax(layer_2)
 
+    def test_one(self, x, y):
+        layer_2, _ = self.forward(x.reshape(-1, 784))
+        correct = self.predict(x) == y
+        goal = np.zeros(10)
+        goal[y] = 1
+        error = np.sum((goal - layer_2) ** 2)
+        return error, correct
+
     def train(self, x_train, y_train):
 
         assert len(x_train) == len(y_train)
 
+        error = 0
         for i in range(len(x_train)):
-            self.backpropagate(x_train[i], y_train[i])
+            error += self.backpropagate(x_train[i], y_train[i])
+
+            if i % 200 == 0:
+                print(f"Training error {error / 200}")
+                error = 0
+
 
     def test(self, x_test, y_test):
 
         assert len(x_test) == len(y_test)
 
-        correct = 0 
+        total_correct = 0 
+        total_error = 0
 
         for i in range(len(x_test)):
-            correct += self.predict(x_test[i]) == y_test[i]
+            error, correct = self.test_one(x_test[i], y_test[i])
+            total_correct += correct
+            total_error += error
 
-        return correct / len(x_test)
+
+        return total_error, total_correct / len(x_test)
