@@ -6,6 +6,7 @@ import os
 import requests
 import pickle
 import gzip
+import uuid
 
 
 def download_mnist():
@@ -27,3 +28,16 @@ def load_mnist():
 
     with gzip.open("./minst.pkl.gz", "rb") as file:
         return pickle.load(file, encoding="latin-1")
+
+
+def save_checkpoint(model):
+    model_id = str(uuid.uuid1())
+    with open(f"models/{model_id}", "wb") as file:
+        file.write(pickle.dumps(model))
+
+    return model_id
+
+
+def load_checkpoint(model_id):
+    with open(f"models/{model_id}", "rb") as file:
+        return pickle.load(file)

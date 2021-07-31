@@ -1,6 +1,7 @@
 import numpy as np
 import sys
 
+
 def relu(x):
     return (x > 0) * x
 
@@ -8,7 +9,9 @@ def relu(x):
 def relu2deriv(output):
     return output > 0
 
+
 # np.set_printoptions(threshold=sys.maxsize)
+
 
 class SimpleNet:
     def __init__(self, alpha=0.005):
@@ -23,7 +26,7 @@ class SimpleNet:
         return layer_2, layer_1
 
     def backpropagate(self, x, y):
-        x = x.reshape(-1, 784) # TODO: understand why this is necessary
+        x = x.reshape(-1, 784)  # TODO: understand why this is necessary
         layer_2, layer_1 = self.forward(x)
         goal = np.zeros(10)
         goal[y] = 1
@@ -49,30 +52,27 @@ class SimpleNet:
         error = np.sum((goal - layer_2) ** 2)
         return error, correct
 
-    def train(self, x_train, y_train):
+    def train(self, x_train, y_train, iterations=20):
 
         assert len(x_train) == len(y_train)
 
-        error = 0
-        for i in range(len(x_train)):
-            error += self.backpropagate(x_train[i], y_train[i])
+        for iteration in range(iterations):
 
-            if i % 200 == 0:
-                print(f"Training error {error / 200}")
-                error = 0
+            error = 0
+            for i in range(len(x_train)):
+                error += self.backpropagate(x_train[i], y_train[i])
 
+            print(f"Error for iteration {iteration}: {error / len(x_train)}")
 
     def test(self, x_test, y_test):
 
         assert len(x_test) == len(y_test)
 
-        total_correct = 0 
-        total_error = 0
+        total_correct, total_error = (0, 0)
 
         for i in range(len(x_test)):
             error, correct = self.test_one(x_test[i], y_test[i])
             total_correct += correct
             total_error += error
 
-
-        return total_error, total_correct / len(x_test)
+        return total_error / len(x_test), total_correct / len(x_test)
