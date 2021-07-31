@@ -9,7 +9,7 @@ def benchmark(model_id=None):
     if not model_id:
         nn = SimpleNet(alpha=0.0001)
         error, accuracy = nn.test(x_test[:1000], y_test[:1000])
-        nn.train(x_train, y_train)
+        nn.train(x_train, y_train, iterations=350)
         model_id = save_checkpoint(nn)
     else:
         nn = load_checkpoint(model_id)
