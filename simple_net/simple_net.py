@@ -14,14 +14,22 @@ def relu2deriv(output):
 
 
 class SimpleNet:
-    def __init__(self, alpha=0.005):
-        self.weights_0_1 = 0.2 * np.random.random((784, 264)) - 0.1
-        self.weights_1_2 = 0.2 * np.random.random((264, 10)) - 0.1
+    def __init__(self, alpha=0.005, hidden_layer_size=264, use_dropout=False):
+        self.weights_0_1 = 0.2 * np.random.random((784, hidden_layer_size)) - 0.1
+        self.weights_1_2 = 0.2 * np.random.random((hidden_layer_size, 10)) - 0.1
         self.alpha = alpha
+        self.dropout_mask = (
+            np.random.randint(2, size=(1, hidden_layer_size)) if use_dropout else None
+        )
 
     def forward(self, x):
+        x = x.reshape(-1, 784)  # TODO: understand why this is necessary
         # TODO: add normalization between layers
         layer_1 = relu(x.dot(self.weights_0_1))
+
+        if self.dropout_mask is not None:
+            layer_1 *= self.dropout_mask * 2
+
         layer_2 = layer_1.dot(self.weights_1_2)
         return layer_2, layer_1
 
@@ -33,6 +41,9 @@ class SimpleNet:
         error = (goal - layer_2) ** 2
         layer_2_delta = goal - layer_2
         layer_1_delta = layer_2_delta.dot(self.weights_1_2.T) * relu2deriv(layer_1)
+
+        if self.dropout_mask is not None:
+            layer_1_delta *= self.dropout_mask
 
         self.weights_1_2 += self.alpha * layer_1.T.dot(layer_2_delta)
         self.weights_0_1 += self.alpha * x.T.dot(layer_1_delta)

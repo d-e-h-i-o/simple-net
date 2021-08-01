@@ -30,6 +30,13 @@ def test_simple_net(x, y):
     assert nn.forward(x)[0].all()
     assert 0 <= nn.predict(x) < 10
     nn.backpropagate(x, y)
+    assert nn.dropout_mask is None
+
+
+def test_dropout(x):
+    nn = SimpleNet(hidden_layer_size=264, use_dropout=True)
+    assert nn.dropout_mask.shape == (1, 264)
+    assert nn.forward(x)[0].all()
 
 
 def test_relu():
