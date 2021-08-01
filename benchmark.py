@@ -7,9 +7,8 @@ def benchmark(model_id=None):
     ((x_train, y_train), (x_test, y_test), _) = load_mnist()
 
     if not model_id:
-        nn = SimpleNet(alpha=0.0001)
-        error, accuracy = nn.test(x_test[:1000], y_test[:1000])
-        nn.train(x_train, y_train, iterations=350)
+        nn = SimpleNet(use_dropout=True)
+        nn.train(x_train, y_train)
         model_id = save_checkpoint(nn)
     else:
         nn = load_checkpoint(model_id)
