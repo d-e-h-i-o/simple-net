@@ -63,17 +63,16 @@ class SimpleNet:
         error = np.sum((goal - layer_2) ** 2)
         return error, correct
 
-    def train(self, x_train, y_train, iterations=20):
+    def train(self, x_train, y_train, epochs=20):
 
         assert len(x_train) == len(y_train)
 
-        for iteration in range(iterations):
-
+        for epoch in range(epochs):
             error = 0
             for i in range(len(x_train)):
                 error += self.backpropagate(x_train[i], y_train[i])
 
-            print(f"Error for iteration {iteration}: {error / len(x_train)}")
+            print(f"Error for epoch {epoch}: {error / len(x_train)}")
 
     def test(self, x_test, y_test):
 
